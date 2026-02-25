@@ -7,6 +7,8 @@ const targetTimeInput = document.getElementById("target-time");
 const recurrencePresetInput = document.getElementById("recurrence-preset");
 const intervalWrap = document.getElementById("interval-wrap");
 const intervalHoursInput = document.getElementById("interval-hours");
+const intervalMinutesWrap = document.getElementById("interval-minutes-wrap");
+const intervalMinutesInput = document.getElementById("interval-minutes");
 const messageWrap = document.getElementById("message-wrap");
 const messageInput = document.getElementById("message");
 const timersEl = document.getElementById("timers");
@@ -50,12 +52,18 @@ const toggleMessage = () => {
 
 const toggleRecurrence = () => {
   const recurring = recurrencePresetInput.value !== "none";
-  const needsInterval = recurrencePresetInput.value === "every_n_hours";
-  intervalWrap.classList.toggle("hidden", !needsInterval);
-  intervalHoursInput.required = needsInterval;
+  const needsIntervalHours = recurrencePresetInput.value === "every_n_hours";
+  const needsIntervalMinutes = recurrencePresetInput.value === "every_n_minutes";
+
+  intervalWrap.classList.toggle("hidden", !needsIntervalHours);
+  intervalHoursInput.required = needsIntervalHours;
+
+  intervalMinutesWrap.classList.toggle("hidden", !needsIntervalMinutes);
+  intervalMinutesInput.required = needsIntervalMinutes;
 
   if (!recurring) {
     intervalWrap.classList.add("hidden");
+    intervalMinutesWrap.classList.add("hidden");
   }
 };
 
@@ -89,6 +97,10 @@ const recurrenceLabel = (recurrence) => {
 
   if (recurrence.preset === "every_n_hours") {
     return `Repeats every ${recurrence.intervalHours ?? "?"} hour(s)`;
+  }
+
+  if (recurrence.preset === "every_n_minutes") {
+    return `Repeats every ${recurrence.intervalMinutes ?? "?"} minute(s)`;
   }
 
   return "Recurring";
@@ -252,6 +264,7 @@ form.addEventListener("submit", async (event) => {
     recurrence = {
       preset: recurrencePreset,
       intervalHours: recurrencePreset === "every_n_hours" ? Number(intervalHoursInput.value || 0) : null,
+      intervalMinutes: recurrencePreset === "every_n_minutes" ? Number(intervalMinutesInput.value || 0) : null,
     };
   }
 
@@ -267,6 +280,7 @@ form.addEventListener("submit", async (event) => {
     form.reset();
     recurrencePresetInput.value = "none";
     intervalHoursInput.value = "2";
+    intervalMinutesInput.value = "30";
     toggleMessage();
     toggleRecurrence();
     showStatus("Timer created.");
