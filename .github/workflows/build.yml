@@ -22,6 +22,33 @@ jobs:
         with:
           workspaces: src-tauri
 
+      - name: Bump Version
+        id: bump_version
+        shell: bash
+        run: |
+          # Read base version
+          BASE_VERSION=$(jq -r '.version' src-tauri/tauri.conf.json)
+          
+          # Strip any existing prerelease tags (e.g. 0.4.2-dev.1 -> 0.4.2)
+          BASE_VERSION=$(echo $BASE_VERSION | cut -d'-' -f1)
+          
+          # Append run number based on branch
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            NEW_VERSION="${BASE_VERSION}.${{ github.run_number }}"
+          else
+            NEW_VERSION="${BASE_VERSION}-dev.${{ github.run_number }}"
+          fi
+          
+          echo "Setting version to: $NEW_VERSION"
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          
+          # Update tauri.conf.json
+          jq --arg v "$NEW_VERSION" '.version = $v' src-tauri/tauri.conf.json > src-tauri/tauri.conf.tmp.json
+          mv src-tauri/tauri.conf.tmp.json src-tauri/tauri.conf.json
+          
+          # Update Cargo.toml
+          sed -i "s/^version = .*/version = \"$NEW_VERSION\"/" src-tauri/Cargo.toml
+
       - name: Install Tauri CLI
         run: cargo install tauri-cli --locked
 
@@ -55,9 +82,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Read version
+      - name: Read bumped version
         id: get_version
-        run: echo "VERSION=$(jq -r '.version' src-tauri/tauri.conf.json)" >> $GITHUB_ENV
+        run: |
+          # Re-compute the version to tag correctly in the release job
+          BASE_VERSION=$(jq -r '.version' src-tauri/tauri.conf.json)
+          BASE_VERSION=$(echo $BASE_VERSION | cut -d'-' -f1)
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            NEW_VERSION="${BASE_VERSION}.${{ github.run_number }}"
+          else
+            NEW_VERSION="${BASE_VERSION}-dev.${{ github.run_number }}"
+          fi
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Download NSIS artifact
         uses: actions/download-artifact@v4
