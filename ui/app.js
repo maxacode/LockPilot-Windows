@@ -305,6 +305,12 @@ updateChannelSelect.addEventListener("change", () => {
 const initialize = async () => {
   toggleMessage();
   toggleRecurrence();
+
+  // Set default target time to current local time
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  targetTimeInput.value = now.toISOString().slice(0, 16);
+
   await loadTimers();
   setInterval(loadTimers, 1000);
 
