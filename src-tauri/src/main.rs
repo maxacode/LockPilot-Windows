@@ -431,7 +431,7 @@ fn run_action(action: &TimerAction, message: Option<&str>) {
 /// On non-Windows platforms this is a no-op (for cross-compilation / type-checking).
 #[cfg(windows)]
 fn lock_workstation() {
-    use windows::Win32::System::StationsAndDesktops::LockWorkStation;
+    use windows::Win32::System::Shutdown::LockWorkStation;
     unsafe {
         let _ = LockWorkStation();
     }
