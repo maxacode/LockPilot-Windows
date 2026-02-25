@@ -29,12 +29,13 @@ jobs:
           # Read base version
           BASE_VERSION=$(jq -r '.version' src-tauri/tauri.conf.json)
           
-          # Strip any existing prerelease tags (e.g. 0.4.2-dev.1 -> 0.4.2)
-          BASE_VERSION=$(echo $BASE_VERSION | cut -d'-' -f1)
+          # Strip any existing prerelease tags or build metadata
+          BASE_VERSION=$(echo $BASE_VERSION | cut -d'-' -f1 | cut -d'+' -f1)
           
-          # Append run number based on branch
+          # Append run number based on branch using valid SemVer
+          # main gets X.Y.Z+build.N, dev gets X.Y.Z-dev.N
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            NEW_VERSION="${BASE_VERSION}.${{ github.run_number }}"
+            NEW_VERSION="${BASE_VERSION}+build.${{ github.run_number }}"
           else
             NEW_VERSION="${BASE_VERSION}-dev.${{ github.run_number }}"
           fi
@@ -87,9 +88,9 @@ jobs:
         run: |
           # Re-compute the version to tag correctly in the release job
           BASE_VERSION=$(jq -r '.version' src-tauri/tauri.conf.json)
-          BASE_VERSION=$(echo $BASE_VERSION | cut -d'-' -f1)
+          BASE_VERSION=$(echo $BASE_VERSION | cut -d'-' -f1 | cut -d'+' -f1)
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            NEW_VERSION="${BASE_VERSION}.${{ github.run_number }}"
+            NEW_VERSION="${BASE_VERSION}+build.${{ github.run_number }}"
           else
             NEW_VERSION="${BASE_VERSION}-dev.${{ github.run_number }}"
           fi
