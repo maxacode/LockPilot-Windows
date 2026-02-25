@@ -346,7 +346,26 @@ fn check_channel_update(
 
     let update = releases.into_iter().find(|release| {
         normalize_version(&release.tag_name)
-            .map(|version| version > current)
+            .map(|version| {
+                if version > current {
+                    return true;
+                }
+                
+                // Strict semver says 0.4.2-dev.19 < 0.4.2. 
+                // However, if the user switches from main (0.4.2) to dev (0.4.2-dev.19), 
+                // we want to consider the latest prerelease of the same base version as an update.
+                if matches!(channel, UpdateChannel::Dev)
+                    && version.major == current.major
+                    && version.minor == current.minor
+                    && version.patch == current.patch
+                    && current.pre.is_empty()
+                    && !version.pre.is_empty()
+                {
+                    return true;
+                }
+                
+                false
+            })
             .unwrap_or(false)
     });
 
