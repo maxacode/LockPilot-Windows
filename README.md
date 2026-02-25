@@ -1,5 +1,7 @@
 # LockPilot - Made by Maks (Windows)
 
+![LockPilot App Screenshot](./assets/app-screenshot.png)
+
 A Windows desktop app to schedule system actions for specific times, including recurring schedules, update channels, and rollback support.
 
 ## Install on Windows
