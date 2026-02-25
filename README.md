@@ -1,4 +1,5 @@
 # LockPilot - Made by Maks (Windows)
+Change in Github.com Manual 
 
 ![LockPilot App Screenshot](./assets/app-screenshot.png)
 
