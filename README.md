@@ -6,7 +6,7 @@ A Windows desktop app to schedule system actions for specific times, including r
 
 Quick Start:
 - **Stable (main):** [Download latest release](https://github.com/maxacode/LockPilot-Windows/releases/latest)
-- **Dev (dev):** [Download latest dev prerelease](https://github.com/maxacode/LockPilot-Windows/releases/tag/dev-latest)
+- **Dev (dev):** [View all prereleases](https://github.com/maxacode/LockPilot-Windows/releases)
 
 ## Features
 

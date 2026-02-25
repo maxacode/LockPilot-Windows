@@ -52,6 +52,13 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: get_version
+        run: echo "VERSION=$(jq -r '.version' src-tauri/tauri.conf.json)" >> $GITHUB_ENV
+
       - name: Download NSIS artifact
         uses: actions/download-artifact@v4
         with:
@@ -62,8 +69,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.run_number }}
-          name: "LockPilot Windows v${{ github.run_number }}"
+          tag_name: v${{ env.VERSION }}
+          name: "LockPilot Windows v${{ env.VERSION }}"
           prerelease: false
           files: ./installers/*
           generate_release_notes: true
@@ -72,8 +79,8 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: dev-latest
-          name: "LockPilot Windows (dev build)"
+          tag_name: v${{ env.VERSION }}
+          name: "LockPilot Windows v${{ env.VERSION }} (dev build)"
           prerelease: true
           files: ./installers/*
           generate_release_notes: true
