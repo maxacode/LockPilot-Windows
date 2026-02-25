@@ -171,7 +171,7 @@ const renderUpdateResult = (update) => {
   updateResultEl.classList.remove("hidden");
   latestVersionEl.textContent = update.tag;
   latestNotesEl.textContent = update.notes?.trim()
-    ? update.notes.split("\n")[0]
+    ? update.notes.trim()
     : "No release notes provided.";
 };
 
